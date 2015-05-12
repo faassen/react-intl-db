@@ -1,0 +1,31 @@
+{
+  "name": "react-intl-db",
+  "version": "0.0.1",
+  "description": "Load app translations automatically partitioned by domain",
+  "main": "lib/main.js",
+  "scripts": {
+    "compile": "babel -d lib/ src/",
+    "prepublish": "npm run compile",
+    "test": "mocha --compilers js:babel/register --ui tdd"
+  },
+  "keywords": [
+    "i18n",
+    "intl",
+    "formatjs",
+    "react"
+  ],
+  "author": "Martijn Faassen",
+  "license": "BSD",
+  "devDependencies": {
+    "babel-core": "^5.2.15",
+    "babel-loader": "^5.0.0",
+    "chai": "^2.3.0",
+    "mocha": "^2.2.4",
+    "webpack": "^1.8.11"
+  },
+  "dependencies": {
+    "intl": "^0.1.4",
+    "react": "^0.13.2",
+    "react-intl": "^1.2.0"
+  }
+}
