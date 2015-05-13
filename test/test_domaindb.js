@@ -82,6 +82,20 @@ suite('domaindb', function() {
             done();
         });
     });
+    test("default domains", function(done) {
+        let defaultDomains = {
+            'a': {'aDefault': 'A_DEFAULT'},
+            'b': {'bDefault': 'B_DEFAULT'}
+        };
+        function myloader(localeId, domainId) {
+            return Promise.resolve(null);
+        }
+        const db = new IntlDomainDatabase(defaultDomains, myloader);
+        db.loadMessages('en-US', 'a').then((messages) => {
+            assert.deepEqual(messages, {'aDefault': 'A_DEFAULT'});
+            done();
+        });
+    });
     test("load domains", function(done) {
         let loads = {'a': 0, 'b': 0};
         function myloader(localeId, domainId) {

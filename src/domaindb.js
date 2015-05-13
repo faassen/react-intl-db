@@ -71,7 +71,8 @@ export class IntlDomainDatabase {
             },
             render() {
                 const props = Object.assign({}, this.props);
-                props.message = this.getMessageById(this.props.messageId);
+                props.message = this.getMessageById(this.locales,
+                                                    this.props.messageId);
                 return React.createElement(FormattedMessage, props);
             }
         });
