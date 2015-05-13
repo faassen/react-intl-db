@@ -68,11 +68,12 @@ export class IntlDomainDatabase {
                 messageId: React.PropTypes.string
             },
             getMessageById(path) {
+                const locales = this.props.locales || this.context.locales;
                 let localeId;
-                if (Array.isArray(this.props.locales)) {
-                    localeId = this.props.locales[0];
+                if (Array.isArray(locales)) {
+                    localeId = locales[0];
                 } else {
-                    localeId = this.props.locales;
+                    localeId = locales;
                 }
                 const messages = db.getMessages(localeId, domainId);
                 const pathParts = path.split('.');
@@ -115,7 +116,8 @@ export class IntlDomainDatabase {
                 if (!this.state.messagesLoaded) {
                     return null;
                 }
-                return <Component {...this.props} />;
+                const props = Object.assign({}, this.props);
+                return <Component {...props} />;
             }
         });
     }

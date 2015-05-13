@@ -31,16 +31,16 @@ const domainsNl = {
     }
 };
 
-function loadDomain(locale, domainId) {
+function loadDomain(localeId, domainId) {
     let messages;
-    if (locale === 'en-US') {
+    if (localeId === 'en-US') {
         messages = domainsEn[domainId];
-    } else if (locale === 'nl-NL') {
+    } else if (localeId === 'nl-NL') {
         messages = domainsNl[domainId];
     }
     if (messages === undefined) {
         throw new Error(
-            "Cannot load domain " + domainId + " in locale " + locale);
+            "Cannot load domain " + domainId + " in locale " + localeId);
     }
     return Promise.resolve(messages);
 }
@@ -85,7 +85,7 @@ class App extends React.Component {
 const IntlApp = db.makeIntl(App);
 
 document.addEventListener('DOMContentLoaded', (event) => {
-    const locale = 'en-US';
+    const locale = 'nl-NL';
 
     React.render(
         <IntlApp locales={locale} />,
