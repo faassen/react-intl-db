@@ -96,6 +96,25 @@ suite('domaindb', function() {
             done();
         });
     });
+    test("no loader", function(done) {
+        const db = new IntlDomainDatabase({});
+        db.loadMessages('en-US', 'a').catch((e) => {
+            assert.equal(e.message,
+                         "Loader not defined and cannot find domain: a");
+            done();
+        });
+    });
+    test("no messages for domain", function(done) {
+        function myloader(localeId, domainId) {
+            return Promise.resolve(null);
+        }
+        const db = new IntlDomainDatabase({}, myloader);
+        db.loadMessages('en-US', 'a').catch((e) => {
+            assert.equal(e.message,
+                         "Unknown locale en-US or domain a");
+            done();
+        });
+    });
     test("load domains", function(done) {
         let loads = {'a': 0, 'b': 0};
         function myloader(localeId, domainId) {
