@@ -7,7 +7,7 @@ let assert = chai.assert;
 
 suite('domaindb', function() {
     test("simple load", function() {
-        function myloader(locale, domainId) {
+        function myloader(localeId, domainId) {
             return Promise.resolve({'foo': 'bar'});
         }
         const db = new IntlDomainDatabase({}, myloader);
@@ -17,7 +17,7 @@ suite('domaindb', function() {
     });
     test("load is cached", function(done) {
         let loads = 0;
-        function myloader(locale, domainId) {
+        function myloader(localeId, domainId) {
             loads++;
             return Promise.resolve({'foo': 'bar'});
         }
@@ -33,7 +33,7 @@ suite('domaindb', function() {
     });
     test("cache per domain", function(done) {
         let loads = {'a': 0, 'b': 0};
-        function myloader(locale, domainId) {
+        function myloader(localeId, domainId) {
             loads[domainId]++;
             return Promise.resolve({'foo': 'bar'});
         }
@@ -61,8 +61,8 @@ suite('domaindb', function() {
     test("cache per domain and locale", function(done) {
         let loads = {'en': {'a': 0, 'b': 0},
                      'nl': {'a': 0, 'b': 0}};
-        function myloader(locale, domainId) {
-            loads[locale][domainId]++;
+        function myloader(localeId, domainId) {
+            loads[localeId][domainId]++;
             return Promise.resolve({'foo': 'bar'});
         }
         const db = new IntlDomainDatabase({}, myloader);
@@ -79,6 +79,22 @@ suite('domaindb', function() {
             assert.equal(loads.en.b, 0);
             assert.equal(loads.nl.a, 1);
             assert.equal(loads.nl.b, 0);
+            done();
+        });
+    });
+    test("load domains", function(done) {
+        let loads = {'a': 0, 'b': 0};
+        function myloader(localeId, domainId) {
+            loads[domainId]++;
+            return Promise.resolve({'foo': 'bar'});
+        }
+        const db = new IntlDomainDatabase({}, myloader);
+
+        db.neededDomainIds.add('a');
+        db.neededDomainIds.add('b');
+        db.loadDomains('en-US').then(() => {
+            assert.equal(loads.a, 1);
+            assert.equal(loads.b, 1);
             done();
         });
     });
