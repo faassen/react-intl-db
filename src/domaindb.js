@@ -43,6 +43,17 @@ export class IntlDomainDatabase {
         }
         return Promise.all(promises);
     }
+    getMessages(localeId, domainId) {
+        const locale = this.locales[localeId];
+        if (locale === undefined) {
+            return this.defaultDomains[domainId];
+        }
+        const domain = locale[domainId];
+        if (domain === undefined) {
+            return this.defaultDomains[domainId];
+        }
+        return domain;
+    }
     makeFormat(domainId) {
         const db = this;
         this.neededDomainIds.add(domainId);
@@ -54,7 +65,13 @@ export class IntlDomainDatabase {
                 messageId: React.PropTypes.string
             },
             getMessageById(path) {
-                const messages = db.domains[domainId];
+                let localeId;
+                if (Array.isArray(this.props.locales)) {
+                    localeId = this.props.locales[0];
+                } else {
+                    localeId = this.props.locales;
+                }
+                const messages = db.getMessages(localeId, domainId);
                 const pathParts = path.split('.');
                 let message;
                 try {
@@ -71,8 +88,8 @@ export class IntlDomainDatabase {
             },
             render() {
                 const props = Object.assign({}, this.props);
-                props.message = this.getMessageById(this.locales,
-                                                    this.props.messageId);
+                props.message = this.getMessageById(this.props.messageId);
+                delete props.messageId;
                 return React.createElement(FormattedMessage, props);
             }
         });
