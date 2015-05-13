@@ -115,8 +115,7 @@ export class IntlDomainDatabase {
                 if (!this.state.messagesLoaded) {
                     return null;
                 }
-                const props = Object.assign({}, this.props);
-                return <Component {...props} />;
+                return <Component {...this.props} />;
             }
         });
     }
