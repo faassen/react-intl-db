@@ -9,6 +9,9 @@ export class IntlDomainDatabase {
         this.loader = loader;
         this.neededDomainIds = new Set();
     }
+    clearMessages() {
+        this.locales = {};
+    }
     loadMessages(localeId, domainId) {
         let domains = this.locales[localeId];
         if (domains === undefined) {

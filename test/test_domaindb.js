@@ -133,7 +133,8 @@ suite('domaindb', function() {
             done();
         });
     });
-    test("makeFormat", function() {
+
+    test("makeFormat with default", function() {
         const renderer = React.addons.TestUtils.createRenderer();
         const db = new IntlDomainDatabase({'a': {'foo': 'bar'}});
         const Format = React.createFactory(db.makeFormat('a'));
@@ -145,6 +146,55 @@ suite('domaindb', function() {
             React.createFactory(FormattedMessage)(
                 {'message': 'bar',
                  'locales': 'en-US'}));
+    });
+
+    test("makeFormat with loader", function(done) {
+        const locales = {
+            'en-US': {
+                'a': {
+                    'hello': "Hello world!"
+                }
+            },
+            "nl-NL": {
+                'a': {
+                    'hello': "Hallo wereld!"
+                }
+            }
+        };
+
+        function myloader(localeId, domainId) {
+            return Promise.resolve(locales[localeId][domainId]);
+        }
+        const db = new IntlDomainDatabase({}, myloader);
+
+        const renderer = React.addons.TestUtils.createRenderer();
+
+        const Format = React.createFactory(db.makeFormat('a'));
+        const formatted = Format({'messageId': 'hello', 'locales': 'en-US'});
+        const formatted2 = Format({'messageId': 'hello', 'locales': 'nl-NL'});
+
+        db.loadDomains('en-US').then(() => {
+            renderer.render(formatted);
+            const output = renderer.getRenderOutput();
+            assert.deepEqual(
+                output,
+                React.createFactory(FormattedMessage)(
+                    {'message': 'Hello world!',
+                     'locales': 'en-US'}));
+        }).then(() => {
+            db.clearMessages();
+            db.loadDomains('nl-NL').then(() => {
+                renderer.render(formatted2);
+                const output = renderer.getRenderOutput();
+                assert.deepEqual(
+                    output,
+                    React.createFactory(FormattedMessage)(
+                        {'message': 'Hallo wereld!',
+                         'locales': 'nl-NL'}));
+                done();
+            });
+        });
+
     });
 
 });
