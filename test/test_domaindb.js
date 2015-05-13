@@ -197,4 +197,6 @@ suite('domaindb', function() {
 
     });
 
+    // FIXME: unfortunately writing a test for makeIntl is insanely difficult
+    // due to setState not actually calling the callback.
 });
