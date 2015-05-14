@@ -12,6 +12,7 @@ module.exports = {
 
             { test: /\.jsx?$/, exclude: /node_modules/, loader: 'babel-loader?stage=0'},
             { test: /\.css$/, loader: "style-loader!css-loader" },
+            { test: /\.json$/, loader: "json-loader" },
             // inline base64 URLs for <=8k images, direct URLs for the rest
             {test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192'},
             // Needed for the css-loader when [bootstrap-webpack](https://github.com/bline/bootstrap-webpack)
