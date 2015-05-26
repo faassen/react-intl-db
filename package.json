@@ -1,12 +1,16 @@
 {
   "name": "react-intl-db",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Load app translations automatically partitioned by domain",
   "main": "lib/domaindb.js",
   "scripts": {
     "compile": "babel -d lib/ src/",
     "prepublish": "npm run compile",
     "test": "mocha --compilers js:babel/register --ui tdd"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/faassen/react-intl-db"
   },
   "keywords": [
     "i18n",
@@ -15,7 +19,7 @@
     "react"
   ],
   "author": "Martijn Faassen",
-  "license": "BSD",
+  "license": "MIT",
   "devDependencies": {
     "babel-core": "^5.2.15",
     "babel-loader": "^5.0.0",
