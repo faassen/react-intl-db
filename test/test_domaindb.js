@@ -12,7 +12,7 @@ suite('domaindb', function() {
         function myloader(localeId, domainId) {
             return Promise.resolve({'foo': 'bar'});
         }
-        const db = new IntlDomainDatabase({}, myloader);
+        const db = new IntlDomainDatabase(myloader);
         return db.loadMessages('en-US', 'foo').then((messages) => {
             assert.deepEqual(messages, {'foo': 'bar'});
         });
@@ -23,7 +23,7 @@ suite('domaindb', function() {
             loads++;
             return Promise.resolve({'foo': 'bar'});
         }
-        const db = new IntlDomainDatabase({}, myloader);
+        const db = new IntlDomainDatabase(myloader);
         db.loadMessages('en-US', 'foo').then((messages) => {
             assert.equal(loads, 1);
         }).then(() => {
@@ -39,7 +39,7 @@ suite('domaindb', function() {
             loads[domainId]++;
             return Promise.resolve({'foo': 'bar'});
         }
-        const db = new IntlDomainDatabase({}, myloader);
+        const db = new IntlDomainDatabase(myloader);
         db.loadMessages('en-US', 'a').then((messages) => {
             assert.equal(loads.a, 1);
             assert.equal(loads.b, 0);
@@ -67,7 +67,7 @@ suite('domaindb', function() {
             loads[localeId][domainId]++;
             return Promise.resolve({'foo': 'bar'});
         }
-        const db = new IntlDomainDatabase({}, myloader);
+        const db = new IntlDomainDatabase(myloader);
         db.loadMessages('en', 'a').then((messages) => {
             assert.equal(loads.en.a, 1);
             assert.equal(loads.en.b, 0);
@@ -85,21 +85,19 @@ suite('domaindb', function() {
         });
     });
     test("default domains", function(done) {
-        let defaultDomains = {
-            'a': {'aDefault': 'A_DEFAULT'},
-            'b': {'bDefault': 'B_DEFAULT'}
-        };
         function myloader(localeId, domainId) {
             return Promise.resolve(null);
         }
-        const db = new IntlDomainDatabase(defaultDomains, myloader);
+        const db = new IntlDomainDatabase(myloader);
+        db.defaultMessages('a', {'aDefault': 'A_DEFAULT'});
+        db.defaultMessages('b', {'bDefault': 'B_DEFAULT'});
         db.loadMessages('en-US', 'a').then((messages) => {
             assert.deepEqual(messages, {'aDefault': 'A_DEFAULT'});
             done();
         });
     });
     test("no loader", function(done) {
-        const db = new IntlDomainDatabase({});
+        const db = new IntlDomainDatabase();
         db.loadMessages('en-US', 'a').catch((e) => {
             assert.equal(e.message,
                          "Loader not defined and cannot find domain: a");
@@ -110,7 +108,7 @@ suite('domaindb', function() {
         function myloader(localeId, domainId) {
             return Promise.resolve(null);
         }
-        const db = new IntlDomainDatabase({}, myloader);
+        const db = new IntlDomainDatabase(myloader);
         db.loadMessages('en-US', 'a').catch((e) => {
             assert.equal(e.message,
                          "Unknown locale en-US or domain a");
@@ -123,7 +121,7 @@ suite('domaindb', function() {
             loads[domainId]++;
             return Promise.resolve({'foo': 'bar'});
         }
-        const db = new IntlDomainDatabase({}, myloader);
+        const db = new IntlDomainDatabase(myloader);
 
         db.neededDomainIds.add('a');
         db.neededDomainIds.add('b');
@@ -136,7 +134,8 @@ suite('domaindb', function() {
 
     test("makeFormat with default", function() {
         const renderer = React.addons.TestUtils.createRenderer();
-        const db = new IntlDomainDatabase({'a': {'foo': 'bar'}});
+        const db = new IntlDomainDatabase();
+        db.defaultMessages('a', {'foo': 'bar'});
         const Format = React.createFactory(db.makeFormat('a'));
         const formatted = Format({'messageId': 'foo', 'locales': 'en-US'});
         renderer.render(formatted);
@@ -165,7 +164,7 @@ suite('domaindb', function() {
         function myloader(localeId, domainId) {
             return Promise.resolve(locales[localeId][domainId]);
         }
-        const db = new IntlDomainDatabase({}, myloader);
+        const db = new IntlDomainDatabase(myloader);
 
         const renderer = React.addons.TestUtils.createRenderer();
 

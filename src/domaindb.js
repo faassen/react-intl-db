@@ -3,14 +3,17 @@ import ReactIntl from 'react-intl';
 import {FormattedMessage} from 'react-intl';
 
 export class IntlDomainDatabase {
-    constructor(defaultDomains, loader) {
-        this.defaultDomains = defaultDomains;
+    constructor(loader) {
+        this.defaultDomains = {};
         this.locales = {};
         this.loader = loader;
         this.neededDomainIds = new Set();
     }
     clearMessages() {
         this.locales = {};
+    }
+    defaultMessages(domainId, messages) {
+        this.defaultDomains[domainId] = messages;
     }
     loadMessages(localeId, domainId) {
         let domains = this.locales[localeId];
