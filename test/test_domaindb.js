@@ -89,8 +89,10 @@ suite('domaindb', function() {
             return Promise.resolve(null);
         }
         const db = new IntlDomainDatabase(myloader);
-        db.defaultMessages('a', {'aDefault': 'A_DEFAULT'});
-        db.defaultMessages('b', {'bDefault': 'B_DEFAULT'});
+        db.defaultMessages({domainId: 'a',
+                            messages: {'aDefault': 'A_DEFAULT'}});
+        db.defaultMessages({domainId: 'b',
+                            messages: {'bDefault': 'B_DEFAULT'}});
         db.loadMessages('en-US', 'a').then((messages) => {
             assert.deepEqual(messages, {'aDefault': 'A_DEFAULT'});
             done();
@@ -135,7 +137,8 @@ suite('domaindb', function() {
     test("makeFormat with default", function() {
         const renderer = React.addons.TestUtils.createRenderer();
         const db = new IntlDomainDatabase();
-        db.defaultMessages('a', {'foo': 'bar'});
+        db.defaultMessages({domainId: 'a',
+                            messages: {'foo': 'bar'}});
         const Format = React.createFactory(db.makeFormat('a'));
         const formatted = Format({'messageId': 'foo', 'locales': 'en-US'});
         renderer.render(formatted);

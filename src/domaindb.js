@@ -12,8 +12,8 @@ export class IntlDomainDatabase {
     clearMessages() {
         this.locales = {};
     }
-    defaultMessages(domainId, messages) {
-        this.defaultDomains[domainId] = messages;
+    defaultMessages(data) {
+        this.defaultDomains[data.domainId] = data.messages;
     }
     loadMessages(localeId, domainId) {
         let domains = this.locales[localeId];
