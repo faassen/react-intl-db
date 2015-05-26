@@ -60,6 +60,22 @@ export class IntlDomainDatabase {
         }
         return domain;
     }
+    getMessageById(localeId, domainId, path) {
+        const messages = this.getMessages(localeId, domainId);
+        const pathParts = path.split('.');
+        let message;
+        try {
+            message = pathParts.reduce((obj, pathPart) => {
+                return obj[pathPart];
+            }, messages);
+        } finally {
+            if (message === undefined) {
+                throw new ReferenceError(
+                    'Could not find Intl message: ' + path);
+            }
+        }
+        return message;
+    }
     makeFormat(domainId) {
         const db = this;
         this.neededDomainIds.add(domainId);
@@ -78,20 +94,7 @@ export class IntlDomainDatabase {
                 } else {
                     localeId = locales;
                 }
-                const messages = db.getMessages(localeId, domainId);
-                const pathParts = path.split('.');
-                let message;
-                try {
-                    message = pathParts.reduce((obj, pathPart) => {
-                        return obj[pathPart];
-                    }, messages);
-                } finally {
-                    if (message === undefined) {
-                        throw new ReferenceError(
-                            'Could not find Intl message: ' + path);
-                    }
-                }
-                return message;
+                return db.getMessageById(localeId, domainId, path);
             },
             render() {
                 const props = Object.assign({}, this.props);
