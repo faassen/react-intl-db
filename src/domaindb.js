@@ -76,6 +76,13 @@ export class IntlDomainDatabase {
         }
         return message;
     }
+    makeFormatFunc(domainId) {
+        const db = this;
+        this.neededDomainIds.add(domainId);
+        return function(component, path) {
+            return db.getMessageById(getLocaleId(component), domainId, path);
+        };
+    }
     makeFormat(domainId) {
         const db = this;
         this.neededDomainIds.add(domainId);
@@ -87,14 +94,7 @@ export class IntlDomainDatabase {
                 messageId: React.PropTypes.string
             },
             getMessageById(path) {
-                const locales = this.props.locales || this.context.locales;
-                let localeId;
-                if (Array.isArray(locales)) {
-                    localeId = locales[0];
-                } else {
-                    localeId = locales;
-                }
-                return db.getMessageById(localeId, domainId, path);
+                return db.getMessageById(getLocaleId(this), domainId, path);
             },
             render() {
                 const props = Object.assign({}, this.props);
@@ -127,4 +127,12 @@ export class IntlDomainDatabase {
             }
         });
     }
+}
+
+function getLocaleId(component) {
+    const locales = component.props.locales || component.context.locales;
+    if (Array.isArray(locales)) {
+        return locales[0];
+    }
+    return locales;
 }

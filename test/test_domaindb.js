@@ -2,7 +2,8 @@ import chai from 'chai';
 // polyfill intl for running tests
 import React from 'react/addons';
 import dummy from 'intl';
-import {FormattedMessage} from 'react-intl';
+import {FormattedMessage } from 'react-intl';
+import ReactIntl from 'react-intl';
 import { IntlDomainDatabase } from '../src/domaindb';
 
 let assert = chai.assert;
@@ -148,6 +149,29 @@ suite('domaindb', function() {
             React.createFactory(FormattedMessage)(
                 {'message': 'bar',
                  'locales': 'en-US'}));
+    });
+
+
+    test("makeFormatFunc with default", function() {
+        const renderer = React.addons.TestUtils.createRenderer();
+        const db = new IntlDomainDatabase();
+        db.defaultMessages({domainId: 'a',
+                            messages: {'foo': 'bar'}});
+        const format = db.makeFormatFunc('a');
+        const Element = React.createClass({
+            mixins: [ReactIntl.IntlMixin],
+            render() {
+                return format(this, 'foo');
+            }
+        });
+
+        const ElementFactory = React.createFactory(Element);
+        const formatted = ElementFactory({'locales': 'en-US'});
+        renderer.render(formatted);
+        const output = renderer.getRenderOutput();
+        assert.deepEqual(
+            output,
+            'bar');
     });
 
     test("makeFormat with loader", function(done) {
