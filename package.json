@@ -2,7 +2,7 @@
   "name": "react-intl-db",
   "version": "0.0.1",
   "description": "Load app translations automatically partitioned by domain",
-  "main": "lib/main.js",
+  "main": "lib/domaindb.js",
   "scripts": {
     "compile": "babel -d lib/ src/",
     "prepublish": "npm run compile",

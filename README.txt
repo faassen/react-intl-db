@@ -1,6 +1,8 @@
 react-intl-db
 =============
 
+Load i18n domains for Format.js's React integration.
+
 To install the required dependencies::
 
 $ npm install
