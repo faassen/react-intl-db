@@ -107,6 +107,15 @@ suite('domaindb', function() {
             done();
         });
     });
+    test("no loader with default domains", function(done) {
+        const db = new IntlDomainDatabase();
+        db.defaultMessages({domainId: 'a',
+                            messages: {'aDefault': 'A_DEFAULT'}});
+        db.loadMessages('en-US', 'a').then((messages) => {
+            assert.deepEqual(messages, {'aDefault': 'A_DEFAULT'});
+            done();
+        });
+    });
     test("no messages for domain", function(done) {
         function myloader(localeId, domainId) {
             return Promise.resolve(null);

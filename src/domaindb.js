@@ -25,8 +25,12 @@ export class IntlDomainDatabase {
             return Promise.resolve(messages);
         }
         if (this.loader === undefined) {
-            return Promise.reject(new Error(
-                "Loader not defined and cannot find domain: " + domainId));
+            const messages = this.defaultDomains[domainId];
+            if (!messages) {
+                return Promise.reject(new Error(
+                    "Loader not defined and cannot find domain: " + domainId));
+            }
+            return Promise.resolve(messages);
         }
         return this.loader(localeId, domainId).then(messages => {
             if (!messages) {

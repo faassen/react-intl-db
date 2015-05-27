@@ -45,7 +45,7 @@ loader returns a promise that resolves to `null` or `undefined` for
 that domain.
 
     i18ndb.defaultMessages({
-       domain: 'mydomain',
+       domainId: 'mydomain',
        messages: {
            'hello': "Hello world!",
            'photos': ('{name} took {numPhotos, plural,' +
