@@ -152,16 +152,16 @@ suite('domaindb', function() {
     });
 
 
-    test("makeFormatFunc with default", function() {
+    test("makeFormatStr with default", function() {
         const renderer = React.addons.TestUtils.createRenderer();
         const db = new IntlDomainDatabase();
         db.defaultMessages({domainId: 'a',
                             messages: {'foo': 'bar'}});
-        const format = db.makeFormatFunc('a');
+        const formatStr = db.makeFormatStr('a');
         const Element = React.createClass({
             mixins: [ReactIntl.IntlMixin],
             render() {
-                return format(this, 'foo');
+                return formatStr(this, 'foo');
             }
         });
 
