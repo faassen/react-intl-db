@@ -76,7 +76,7 @@ export class IntlDomainDatabase {
         }
         return message;
     }
-    makeFormatFunc(domainId) {
+    makeFormatStr(domainId) {
         const db = this;
         this.neededDomainIds.add(domainId);
         return function(component, path) {
