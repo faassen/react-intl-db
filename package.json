@@ -1,6 +1,6 @@
 {
   "name": "react-intl-db",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Load app translations automatically partitioned by domain",
   "main": "lib/domaindb.js",
   "scripts": {
