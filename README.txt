@@ -35,7 +35,7 @@ server:
 
 The next step is to create an `IntDomainDatabase` with this loader:
 
-    import {IntlDomainDatabase} from `react-intl-db`;
+    import {IntlDomainDatabase} from 'react-intl-db';
 
     i18ndb = new IntlDomainDatabase(loader);
 
@@ -65,7 +65,7 @@ You now have a new `IntlApp` React component that is like `App``, but
 takes the `locales` prop. This should contain the locale you want
 the application to use:
 
-    <IntlApp locales="en-US" />
+    <IntlApp locales="en-US">...</IntlApp>
 
 `IntlApp` now also makes sure that the right messages are loaded using
 the loader before rendering begins.
