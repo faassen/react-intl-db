@@ -127,6 +127,21 @@ suite('domaindb', function() {
             done();
         });
     });
+    test("missing messages for domain", function(done) {
+        function myloader(localeId, domainId) {
+            return Promise.resolve({'present': 'PRESENT'});
+        }
+        const db = new IntlDomainDatabase(myloader);
+        db.defaultMessages({domainId: 'a',
+                            messages: {'missing': 'MISSING'}});
+
+        db.loadMessages('en-US', 'a').then(messages => {
+            assert.deepEqual(messages, {'present': 'PRESENT',
+                                        'missing': 'MISSING'});
+            done();
+        });
+    });
+
     test("load domains", function(done) {
         let loads = {'a': 0, 'b': 0};
         function myloader(localeId, domainId) {

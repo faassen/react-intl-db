@@ -33,14 +33,18 @@ export class IntlDomainDatabase {
             return Promise.resolve(messages);
         }
         return this.loader(localeId, domainId).then(messages => {
+            const domainMessages = this.defaultDomains[domainId];
             if (!messages) {
-                messages = this.defaultDomains[domainId];
-                if (!messages) {
+                if (!domainMessages) {
                     return Promise.reject(
                         new Error("Unknown locale " + localeId +
                                   " or domain " + domainId));
                 }
-                return messages;
+                return domainMessages;
+            }
+            if (domainMessages) {
+                messages = Object.assign(domainMessages,
+                                         messages);
             }
             domains[domainId] = messages;
             return messages;
