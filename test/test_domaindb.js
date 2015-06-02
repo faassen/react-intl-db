@@ -4,9 +4,13 @@ import React from 'react/addons';
 import dummy from 'intl';
 import {FormattedMessage } from 'react-intl';
 import ReactIntl from 'react-intl';
+import jsdom from 'jsdom';
 import { IntlDomainDatabase } from '../src/domaindb';
 
 let assert = chai.assert;
+
+global.document = jsdom.jsdom('<!doctype html><html><body></body></html>');
+global.window = document.parentWindow;
 
 suite('domaindb', function() {
     test("simple load", function() {
@@ -152,7 +156,7 @@ suite('domaindb', function() {
 
         db.neededDomainIds.add('a');
         db.neededDomainIds.add('b');
-        db.loadDomains('en-US').then(() => {
+        db.setLocale('en-US').then(() => {
             assert.equal(loads.a, 1);
             assert.equal(loads.b, 1);
             done();
@@ -165,14 +169,15 @@ suite('domaindb', function() {
         db.defaultMessages({domainId: 'a',
                             messages: {'foo': 'bar'}});
         const Format = React.createFactory(db.makeFormat('a'));
-        const formatted = Format({'messageId': 'foo', 'locales': 'en-US'});
+        db.setLocale('en-US');
+        const formatted = Format({'messageId': 'foo'});
         renderer.render(formatted);
         const output = renderer.getRenderOutput();
         assert.deepEqual(
             output,
             React.createFactory(FormattedMessage)(
                 {'message': 'bar',
-                 'locales': 'en-US'}));
+                'locales': 'en-US'}));
     });
 
 
@@ -183,14 +188,14 @@ suite('domaindb', function() {
                             messages: {'foo': 'bar'}});
         const formatStr = db.makeFormatStr('a');
         const Element = React.createClass({
-            mixins: [ReactIntl.IntlMixin],
             render() {
-                return formatStr(this, 'foo');
+                return formatStr('foo');
             }
         });
 
         const ElementFactory = React.createFactory(Element);
-        const formatted = ElementFactory({'locales': 'en-US'});
+        db.setLocale('en-US');
+        const formatted = ElementFactory();
         renderer.render(formatted);
         const output = renderer.getRenderOutput();
         assert.deepEqual(
@@ -220,10 +225,11 @@ suite('domaindb', function() {
         const renderer = React.addons.TestUtils.createRenderer();
 
         const Format = React.createFactory(db.makeFormat('a'));
-        const formatted = Format({'messageId': 'hello', 'locales': 'en-US'});
-        const formatted2 = Format({'messageId': 'hello', 'locales': 'nl-NL'});
+        const formatted = Format({'messageId': 'hello'});
+        const formatted2 = Format({'messageId': 'hello'});
 
-        db.loadDomains('en-US').then(() => {
+        db.setLocale('en-US').then(() => {
+            db.setLocale('en-US');
             renderer.render(formatted);
             const output = renderer.getRenderOutput();
             assert.deepEqual(
@@ -233,20 +239,48 @@ suite('domaindb', function() {
                      'locales': 'en-US'}));
         }).then(() => {
             db.clearMessages();
-            db.loadDomains('nl-NL').then(() => {
+            db.setLocale('nl-NL').then(() => {
+                db.setLocale('nl-NL');
                 renderer.render(formatted2);
                 const output = renderer.getRenderOutput();
                 assert.deepEqual(
                     output,
                     React.createFactory(FormattedMessage)(
                         {'message': 'Hallo wereld!',
-                         'locales': 'nl-NL'}));
+                        'locales': 'nl-NL'}));
                 done();
             });
         });
 
     });
-
-    // FIXME: unfortunately writing a test for makeIntl is insanely difficult
-    // due to setState not actually calling the callback.
+    test("Format date", function() {
+        const db = new IntlDomainDatabase();
+        db.defaultMessages({
+            domainId: 'a',
+            messages: {'foo': 'From {start, date, long}'}});
+        const Format = React.createFactory(db.makeFormat('a'));
+        db.setLocale('en-US');
+        const formatted = Format({'messageId': 'foo',
+                                  start: new Date('2003-12-24')});
+        React.render(formatted, document.body);
+        assert.equal(document.body.textContent, 'From December 24, 2003');
+    });
+    test("formatStr date", function() {
+        const db = new IntlDomainDatabase();
+        db.defaultMessages({
+            domainId: 'a',
+            messages: {'foo': 'From {start, date, long}'}});
+        const formatStr = db.makeFormatStr('a');
+        const Element = React.createClass({
+            render() {
+                return React.createElement(
+                    'span', null,
+                    formatStr('foo', {'start': new Date('2003-12-24')}));
+            }
+        });
+        const ElementFactory = React.createFactory(Element);
+        db.setLocale('en-US');
+        React.render(ElementFactory(), document.body);
+        assert.equal(document.body.textContent, 'From December 24, 2003');
+    });
 });

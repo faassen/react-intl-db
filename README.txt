@@ -42,7 +42,7 @@ The next step is to create an `IntDomainDatabase` with this loader:
 You can supply the `i18ndb` with default messages as well. These
 messages are used when no loader argument is passed in, or if the
 loader returns a promise that resolves to `null` or `undefined` for
-that domain.
+that domain, or when the loader doesn't define a particular message.
 
     i18ndb.defaultMessages({
        domainId: 'mydomain',
@@ -56,19 +56,13 @@ that domain.
        }
     })
 
-We can now start using this i18ndb with React. You first need to make
-the root component of the application aware of the i18n db:
+We can now start using this i18ndb with React. Before we can start the
+`React.render` though, we need to make sure we have loaded the information
+for the right domain:
 
-    const IntlApp = i18ndb.makeIntl(App)
-
-You now have a new `IntlApp` React component that is like `App``, but
-takes the `locales` prop. This should contain the locale you want
-the application to use:
-
-    <IntlApp locales="en-US">...</IntlApp>
-
-`IntlApp` now also makes sure that the right messages are loaded using
-the loader before rendering begins.
+    i18ndb.setLocale('en-US').then(() => {
+        React.render(<App />, document.body);
+    });
 
 We can now create a `Format` component for a particular domain that a
 UI application can then use:
@@ -99,21 +93,30 @@ creating a helper function:
 
     const formatStr = i18ndb.makeFormatStr('myapp')
 
-You use it by passing the component (typically `this`) as the first
-argument, as it needs this to obtain the locale information from the
-context:
+You use it by passing the `messageId` as the first argument:
 
     render() {
-        return <input value={formatStr(this, 'myMessageId')} />;
+        return <input value={formatStr('myMessageId')} />;
     }
+
+You can also put in variables:
+
+    render() {
+        return <input value={formatStr('photos',
+           { name: 'Annie', numPhotos=1000, takenDate=Date.now()})} />;
+    }
+
 
 Limitation
 ----------
 
 Currently `react-intl-db` only properly supports a single locale per
 application, not a list of locales. You can instead make sure the
-right fallback is happening in the loader. I'm also happy to receive
-code that lists this limitation!
+right fallback is happening in the loader.
+
+It also has no support for custom formats yet.
+
+I'm happy to receive code that lifts these limitations!
 
 Example application
 -------------------
@@ -130,5 +133,4 @@ rebuilds the bundle and serves the content in ``build`` like this:
     $ webpack-dev-server --progress --colors --content-base build
 
 You can then access the example app on http://localhost:8080
-
 

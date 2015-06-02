@@ -1,11 +1,13 @@
 import React from 'react';
 import ReactIntl from 'react-intl';
-import {FormattedMessage} from 'react-intl';
+import {FormattedMessage, IntlMixin} from 'react-intl';
+
 
 export class IntlDomainDatabase {
     constructor(loader) {
         this.defaultDomains = {};
         this.locales = {};
+        this.currentLocaleId = null;
         this.loader = loader;
         this.neededDomainIds = new Set();
     }
@@ -14,6 +16,10 @@ export class IntlDomainDatabase {
     }
     defaultMessages(data) {
         this.defaultDomains[data.domainId] = data.messages;
+    }
+    setLocale(localeId) {
+        this.currentLocaleId = localeId;
+        return this.loadDomains(localeId);
     }
     loadMessages(localeId, domainId) {
         let domains = this.locales[localeId];
@@ -87,8 +93,16 @@ export class IntlDomainDatabase {
     makeFormatStr(domainId) {
         const db = this;
         this.neededDomainIds.add(domainId);
-        return function(component, path) {
-            return db.getMessageById(getLocaleId(component), domainId, path);
+        return function(path, values) {
+            if (values === undefined) {
+                values = {};
+            }
+            // XXX formats support
+            const message = db.getMessageById(
+                db.currentLocaleId, domainId, path);
+            const format = IntlMixin.getMessageFormat(
+                message, db.currentLocaleId, {});
+            return format.format(values);
         };
     }
     makeFormat(domainId) {
@@ -102,45 +116,15 @@ export class IntlDomainDatabase {
                 messageId: React.PropTypes.string
             },
             getMessageById(path) {
-                return db.getMessageById(getLocaleId(this), domainId, path);
+                return db.getMessageById(db.currentLocaleId, domainId, path);
             },
             render() {
                 const props = Object.assign({}, this.props);
                 props.message = this.getMessageById(this.props.messageId);
+                props.locales = db.currentLocaleId;
                 delete props.messageId;
                 return React.createElement(FormattedMessage, props);
             }
         });
     }
-    makeIntl(Component) {
-        const db = this;
-        return React.createClass({
-            mixins: [ReactIntl.IntlMixin],
-            getInitialState() {
-                return {
-                    'messagesLoaded': false
-                }
-            },
-            componentWillMount() {
-                db.loadDomains(this.props.locales).then(() => {
-                    this.setState({'messagesLoaded': true});
-                });
-            },
-            render() {
-                if (!this.state.messagesLoaded) {
-                    return null;
-                }
-                const props = Object.assign({}, this.props);
-                return <Component {...props} />;
-            }
-        });
-    }
-}
-
-function getLocaleId(component) {
-    const locales = component.props.locales || component.context.locales;
-    if (Array.isArray(locales)) {
-        return locales[0];
-    }
-    return locales;
 }

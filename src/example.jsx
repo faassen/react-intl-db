@@ -45,7 +45,7 @@ function loadDomain(localeId, domainId) {
     return Promise.resolve(messages);
 }
 
-const db = new IntlDomainDatabase({}, loadDomain);
+const db = new IntlDomainDatabase(loadDomain);
 
 const Format = db.makeFormat('main');
 const OtherFormat = db.makeFormat('other');
@@ -82,13 +82,11 @@ class App extends React.Component {
     }
 }
 
-const IntlApp = db.makeIntl(App);
-
 document.addEventListener('DOMContentLoaded', (event) => {
-    const locale = 'nl-NL';
-
-    React.render(
-        <IntlApp locales={locale} />,
-        document.body
-    );
+    db.setLocale('nl-NL').then(() => {
+        React.render(
+            <App />,
+            document.body
+        );
+    });
 });
